@@ -1,8 +1,10 @@
 import { Input, InputProps } from "@heroui/input";
-import { Select, SelectProps, SelectSectionProps } from "@heroui/react";
+import { Select, SelectProps } from "@heroui/react";
 import { ReactNode } from "react";
+
 type InputCustomProps = InputProps;
-type SelectCustomProps = SelectProps & {children : ReactNode}
+type SelectCustomProps = SelectProps & { children: ReactNode };
+
 export default function InputCustom({
   variant = "bordered",
   labelPlacement = "outside-top",
@@ -10,11 +12,16 @@ export default function InputCustom({
 }: InputCustomProps) {
   return <Input variant={variant} labelPlacement={labelPlacement} {...props} />;
 }
+
 export function SelectCustom({
   variant = "bordered",
   labelPlacement = "outside-top",
   children,
   ...props
-} : SelectCustomProps) {
-  return <Select variant={variant} labelPlacement={labelPlacement} {...props}>{children}</Select>
+}: SelectCustomProps) {
+  return (
+    <Select variant={variant} labelPlacement={labelPlacement} {...props}>
+      {children}
+    </Select>
+  );
 }
