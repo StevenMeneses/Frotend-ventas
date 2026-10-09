@@ -4,7 +4,7 @@ import { loginDB } from "@/service/auth.service";
 import { Alert, Button, Checkbox } from "@heroui/react";
 import axios from "axios";
 import { Lock, User, Wine } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 
 interface Login {
@@ -19,7 +19,6 @@ interface AlertResponse {
 
 export default function SectionForm() {
   const searchParams = useSearchParams();
-  const router = useRouter(); // 1. Activamos el enrutador de Next.js
   const [login, setLogin] = useState<Login>({
     email: "",
     password: "",
@@ -43,11 +42,10 @@ export default function SectionForm() {
         ? decodeURIComponent(redirectUrl)
         : "/dashboard";
 
-      // 2. Refrescamos el estado del router para registrar las cookies del servidor
-      router.refresh();
-
-      // 3. Redirigimos suavemente al dashboard sin recargar en seco
-      router.push(destination);
+      // Forzamos la redirección absoluta por ventana para romper el bucle del middleware
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 500);
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
