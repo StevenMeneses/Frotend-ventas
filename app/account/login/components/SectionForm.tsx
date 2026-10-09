@@ -4,61 +4,52 @@ import { loginDB } from "@/service/auth.service";
 import { Alert, Button, Checkbox } from "@heroui/react";
 import axios from "axios";
 import { Lock, User, Wine } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useState } from "react";
-
 interface Login {
   email: string;
   password: string;
 }
-
 interface AlertResponse {
-  message: string | null;
-  color: "warning" | "success" | "danger";
+  message : string | null,
+  color : "warning" | "success" | "danger"
 }
-
 export default function SectionForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [login, setLogin] = useState<Login>({
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState<AlertResponse>({ message: null, color: "danger" });
+  const [alert, setAlert] = useState<AlertResponse>({message : null, color : "danger"});
   const redirectUrl = searchParams.get("redirect");
-
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     setLogin((prev) => ({ ...prev, [target.name]: target.value }));
   };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
       await loginDB(login.email, login.password);
-      setAlert({ color: "success", message: "Usuario logeado correctamente" });
-
+      setAlert({color: "success", message:  "Usuario logeado correctamente"});
       const destination = redirectUrl
         ? decodeURIComponent(redirectUrl)
         : "/dashboard";
-
-      // Forzamos la redirección absoluta por ventana para romper el bucle del middleware
-      setTimeout(() => {
-        window.location.href = destination;
-      }, 500);
-
+      router.push(destination);
+      router.refresh();
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setAlert({ color: "danger", message: error.response?.data?.message || "Ocurrió un error inesperado" });
+        setAlert({color: "danger", message:  error.response?.data?.message || "Ocurrió un error inesperado"});
       } else if (error instanceof Error) {
-        setAlert({ color: "danger", message: error.message });
+        setAlert({color : "danger", message: error.message});
       } else {
-        setAlert({ color: "danger", message: "Ocurrió un error inesperado, por favor intentelo nuevamente" });
+        setAlert({color : "danger", message: "Ocurrió un error inesperado, por favor intentelo nuevamente"});
       }
+    }finally {
       setLoading(false);
     }
   };
-
   return (
     <section className="flex w-full items-center justify-center bg-[#f7f6f3] px-5 py-10 lg:w-[45%]">
       <div className="w-full max-w-md">
@@ -84,7 +75,7 @@ export default function SectionForm() {
         </div>
         {alert.message && <Alert color={alert.color} title={alert.message} className="mb-4" />}
         <form className="space-y-5" onSubmit={handleSubmit}>
-          <div className="mb-5">
+          <div className=" mb-5">
             <InputCustom
               size="lg"
               type="text"
@@ -112,9 +103,10 @@ export default function SectionForm() {
           </div>
           <div className="my-5 flex gap-3 justify-between items-center">
             <Checkbox size="md">Recordame accesos</Checkbox>
+            {/* <a href="#" className="text-primary text-sm">¿Olvidaste tu contraseña?</a> */}
           </div>
           <div>
-            <Button size="lg" type="submit" isDisabled={loading} isLoading={loading} fullWidth color="primary">
+            <Button size="lg" type="submit" isDisabled={loading} fullWidth color="primary">
               Iniciar sesión
             </Button>
           </div>
@@ -136,7 +128,8 @@ export default function SectionForm() {
                 Acceso restringido
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
-                Este sistema es de uso exclusivo para personal autorizado de la empresa.
+                Este sistema es de uso exclusivo para personal autorizado de la
+                empresa.
               </p>
             </div>
           </div>
